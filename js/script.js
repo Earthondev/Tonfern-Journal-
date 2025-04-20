@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const flipbook = document.getElementById('flipbook');
     
     const flipbookContainer = $("#flipbook");
+    const flipSound = new Audio('/assets/sounds/page-flip.mp3'); // เสียงพลิกหน้า
 
     flipbookContainer.hide(); // ซ่อน flipbook ในตอนแรก
 
@@ -25,6 +26,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('prev-page').addEventListener('click', () => {
         if (flipbookContainer.turn('page') > 1) {
             flipbookContainer.turn('previous');
+            flipSound.play(); // เล่นเสียงพลิกหน้า
         }
+    });
+
+    // ปุ่มหน้าถัดไป (next page)
+    nextButton.addEventListener('click', () => {
+        flipbookContainer.turn('next');
+        flipSound.play(); // เล่นเสียงพลิกหน้า
     });
 });
