@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - เพิ่มหน้าใหม่</title>
+    <link rel="stylesheet" href="../css/admin.css">
+
+    <style>
+        img#preview {
+            margin-top: 10px;
+            max-width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            display: none;
+        }
+        #messageBox {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            display: none;
+        }
+        #messageBox.success {
+            background-color: #e0f7e9;
+            color: #2e7d32;
+        }
+        #messageBox.error {
+            background-color: #fdecea;
+            color: #c62828;
+        }
+    </style>
+</head>
+<body>
+    <h1>เพิ่มหน้าใหม่</h1>
+    <form id="newPageForm">
+        <div>
+            <label for="imageUrl">URL รูปภาพจาก Imgur (.jpg, .png, .gif หรือ .mp4):</label>
+            <input type="text" id="imageUrl" name="imageUrl" required>
+            <img id="preview" alt="Preview">
+        </div>
+        <div>
+            <label for="text">ข้อความ (ถ้ามี):</label>
+            <textarea id="text" name="text"></textarea>
+        </div>
+        <div>
+            <label for="tags">แท็ก (คั่นด้วยเครื่องหมาย "," ถ้ามี):</label>
+            <input type="text" id="tags" name="tags">
+        </div>
+        <div>
+            <label for="order">ลำดับหน้า:</label>
+            <input type="number" id="order" name="order" required>
+            <small>ใส่ตัวเลขลำดับที่ต้องการให้หน้านี้แสดง (เช่น 1 คือหน้าแรก)</small>
+        </div>
+        <button type="submit">บันทึกหน้าใหม่</button>
+    </form>
+
+    <div id="messageBox"></div>
+
+    <script type="module" src="./script.js"></script>
+    <script>
+        // แสดง preview รูปภาพอัตโนมัติเมื่อผู้ใช้กรอก URL
+        document.getElementById('imageUrl').addEventListener('input', function () {
+            const url = this.value.trim();
+            const preview = document.getElementById('preview');
+            if (url.match(/\.(jpeg|jpg|png|gif)$/i)) {
+                preview.src = url;
+                preview.style.display = 'block';
+            } else {
+                preview.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

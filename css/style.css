@@ -1,0 +1,30 @@
+import { database, ref, push, set } from '../js/firebase-config.js';
+
+const form = document.getElementById('newPageForm');
+
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const imageUrl = document.getElementById('imageUrl').value;
+    const text = document.getElementById('text').value;
+    const tags = document.getElementById('tags').value.split(',').map(t => t.trim());
+    const order = parseInt(document.getElementById('order').value);
+
+    const pageData = {
+        imageUrl,
+        text,
+        tags,
+        order,
+        createdAt: Date.now()
+    };
+
+    try {
+        const newPageRef = push(ref(database, 'pages'));
+        await set(newPageRef, pageData);
+        alert('เพิ่มหน้าสำเร็จแล้ว 🎉');
+        form.reset();
+    } catch (err) {
+        console.error(err);
+        alert('เกิดข้อผิดพลาดในการบันทึก');
+    }
+});
