@@ -2,88 +2,87 @@ body, html {
     margin: 0;
     padding: 0;
     height: 100%;
-    background-image: url('https://imgur.com/PypgqPk.jpg'); /* เปลี่ยนเป็น URL พื้นหลังของคุณ */
+    background-image: url('https://imgur.com/PypgqPk.jpg');
     background-size: cover;
     background-position: center;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* เปลี่ยนฟอนต์ให้ดูทันสมัย */
-    color: #333; /* สีข้อความหลัก */
-    overflow: hidden; /* ป้องกัน scrollbar ที่ไม่จำเป็น */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
 }
 
 .container {
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+}
+
+.sidebar {
+    width: 200px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 20px;
     height: 100%;
-    padding: 20px; /* เพิ่มระยะขอบโดยรวม */
-    box-sizing: border-box; /* รวม padding ในขนาดของ container */
+    overflow-y: auto;
+}
+
+#toc {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+#toc li {
+    margin: 10px 0;
+}
+
+#bookmark-section {
+    margin-top: 20px;
 }
 
 .journal {
-    flex-grow: 1;
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    margin-left: 220px;
+    padding: 20px;
 }
 
 #journal-container {
-    background-color: rgba(255, 255, 255, 0.8); /* เพิ่มพื้นหลังโปร่งแสง */
-    border-radius: 15px; /* ขอบมน */
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* เงาที่ดูดีขึ้น */
-    padding: 30px; /* เพิ่มระยะห่างภายใน */
-    text-align: center; /* จัดข้อความกลาง */
+    text-align: center;
 }
 
 .cover-image {
-    max-width: 90%;
-    max-height: 90%;
-    border-radius: 10px; /* ขอบมนสำหรับรูปภาพ */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* เงาเล็กน้อยสำหรับรูปภาพ */
+    width: 90%;
+    max-width: 800px;
 }
 
 #flipbook {
-    display: none;
-    width: 90%; /* ปรับขนาด flipbook */
-    max-width: 800px; /* กำหนดขนาดสูงสุด */
-    margin: 20px auto; /* จัดกลางและเพิ่มขอบด้านบน/ล่าง */
-    border-radius: 10px; /* ขอบมนสำหรับ flipbook */
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3); /* เงาที่เด่นขึ้นสำหรับ flipbook */
-    background-color: #f9f9f9; /* สีพื้นหลังอ่อนๆ สำหรับ flipbook */
-    padding: 20px; /* เพิ่มระยะห่างภายใน flipbook */
+    width: 80%;
+    margin: 0 auto;
 }
 
 .navigation {
     position: fixed;
-    bottom: 30px; /* ปรับตำแหน่งลงเล็กน้อย */
+    bottom: 30px;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 10;
     display: flex;
-    gap: 15px; /* เพิ่มระยะห่างระหว่างปุ่ม */
+    gap: 15px;
 }
 
 .navigation button {
-    background-color: #e9ecef; /* สีพื้นหลังปุ่มที่ดูนุ่มนวลขึ้น */
-    border: none; /* ลบเส้นขอบ */
-    color: #495057; /* สีข้อความปุ่มที่เข้มขึ้นเล็กน้อย */
-    font-size: 1.2rem; /* ลดขนาดตัวอักษรเล็กน้อย */
-    padding: 12px 25px; /* ปรับขนาด padding */
+    background-color: #e9ecef;
+    border: none;
+    padding: 12px 25px;
+    font-size: 1.2rem;
+    border-radius: 10px;
     cursor: pointer;
-    border-radius: 10px; /* ขอบมนของปุ่ม */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* เงาที่ละเอียดขึ้น */
-    transition: background-color 0.3s ease, transform 0.2s ease; /* เพิ่ม easing ให้ transition */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .navigation button:hover {
-    background-color: #ced4da; /* สีพื้นหลังเมื่อ hover */
-    transform: scale(1.05); /* ขยายเล็กน้อยเมื่อ hover */
+    background-color: #ced4da;
 }
 
-#next-page {
-    display: block; /* แสดงปุ่มนี้ในหน้าปก */
-}
-
-#prev-page {
-    display: none; /* ซ่อนปุ่มย้อนกลับ */
+input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 }

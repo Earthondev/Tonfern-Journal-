@@ -11,20 +11,61 @@
 </head>
 <body>
     <div class="container">
+        <div class="sidebar">
+            <h2>Table of Contents</h2>
+            <ul id="toc"></ul> <!-- แสดง TOC ที่นี่ -->
+            <div id="bookmark-section">
+                <h3>Bookmark Page</h3>
+                <button id="bookmark-btn">Bookmark</button>
+            </div>
+        </div>
         <main class="journal">
             <div id="journal-container">
                 <img src="https://imgur.com/khegeuu.jpg" alt="หน้าปกสมุด" class="cover-image">
             </div>
         </main>
-        <div id="flipbook">
-            <!-- หน้า flipbook จะไปที่นี่ -->
+      <div id="flipbook">
+        <!-- หน้า 1 -->
+        <div class="page">
+          <img src="https://imgur.com/khegeuu.jpg" alt="หน้าปก" />
         </div>
-        <div class="navigation">
-            <button id="prev-page">←</button>
-            <button id="next-page">→</button>        
+
+        <!-- หน้า 2 -->
+        <div class="page" data-title="หน้า 1">
+          <img src="https://imgur.com/rggbARA.jpg" alt="หน้า 1" />
+          <div class="page-tools">
+            <button class="bookmark-btn">🔖</button>
+            <button class="note-btn">📝</button>
+          </div>
+          <div class="note-popup">
+            <textarea placeholder="เขียนโน้ต..."></textarea>
+            <button class="save-note">บันทึก</button>
+          </div>
         </div>
-    </div>
-    <script src="firebase-config.js"></script>
-    <script src="./js/script.js"></script>
+
+        <!-- หน้า 3 -->
+        <div class="page" data-title="วิดีโอ">
+          <video src="https://imgur.com/sbvgjjl.mp4" controls></video>
+          <div class="page-tools">
+            <button class="bookmark-btn">🔖</button>
+            <button class="note-btn">📝</button>
+          </div>
+          <div class="note-popup">
+            <textarea placeholder="เขียนโน้ต..."></textarea>
+            <button class="save-note">บันทึก</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <div class="navigation">
+        <button id="prev-page">←</button>
+        <button id="next-page">→</button>
+      </div>
+    </main>
+  </div>
+
+  <audio id="flip-sound" src="./assets/sounds/page-flip.mp3" preload="auto"></audio>
+  <script src="./js/script.js"></script>
 </body>
 </html>
