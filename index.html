@@ -5,24 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tonfern Journal</title>
     <link rel="stylesheet" href="./css/style.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/4.1.0/turn.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/4.1.0/turn.html4.min.js"></script>
 </head>
 <body>
     <div class="container">
-        <aside class="sidebar">
-            <h3>สารบัญ</h3>
-            <ul id="toc-list">
-                </ul>
-        </aside>
         <main class="journal">
             <div id="journal-container">
-                </div>
-            <div class="navigation">
-                <button id="prev-page">หน้าก่อนหน้า</button>
-                <button id="next-page">หน้าถัดไป</button>
+                <img src="https://imgur.com/khegeuu.jpg" alt="หน้าปกสมุด" class="cover-image">
             </div>
         </main>
+        <div id="flipbook">
+            <!-- หน้า flipbook จะไปที่นี่ -->
+        </div>
+        <div class="navigation">
+            <button id="prev-page">←</button>
+            <button id="next-page">→</button>        
+        </div>
     </div>
-
-    <script type="module" src="./js/script.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="./js/script.js"></script>
 </body>
 </html>

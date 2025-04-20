@@ -1,11 +1,7 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref, push, set, onValue } from "firebase/database"; // Import Realtime Database functions
-import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage"; // Import Storage functions
-import { getAnalytics } from "firebase/analytics";
+import { getDatabase, ref, onValue } from "firebase/database"; // Import Realtime Database functions
+import { getStorage } from "firebase/storage"; // Import Storage functions
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyCJu9g3YVy9-sdvBas5ZiI1C8BhI2RP1Ig",
   authDomain: "tonfern-jounal.firebaseapp.com",
@@ -17,11 +13,18 @@ const firebaseConfig = {
   measurementId: "G-0DD8SKYJ0D"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+const database = getDatabase(app);
+const storage = getStorage(app);
 
-// Export Firebase services for use in other files
-export const database = getDatabase(app);
-export const storage = getStorage(app);
-export { ref, push, set, onValue, storageRef, uploadBytes, getDownloadURL };
+export { database, storage, ref, onValue };
+    messageBox.classList.add(type);
+    messageBox.style.display = 'block';
+//
+//     // Load pages on page load
+//     loadPages();
+//
+//     // Load tags for filtering
+//     onValue(tagsRef, (snapshot) => {
+//         if (snapshot.exists()) {
+            const tags = [];                    

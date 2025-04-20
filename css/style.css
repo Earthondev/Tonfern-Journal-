@@ -1,30 +1,89 @@
-import { database, ref, push, set } from '../js/firebase-config.js';
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background-image: url('https://imgur.com/PypgqPk.jpg'); /* เปลี่ยนเป็น URL พื้นหลังของคุณ */
+    background-size: cover;
+    background-position: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* เปลี่ยนฟอนต์ให้ดูทันสมัย */
+    color: #333; /* สีข้อความหลัก */
+    overflow: hidden; /* ป้องกัน scrollbar ที่ไม่จำเป็น */
+}
 
-const form = document.getElementById('newPageForm');
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    padding: 20px; /* เพิ่มระยะขอบโดยรวม */
+    box-sizing: border-box; /* รวม padding ในขนาดของ container */
+}
 
-form.addEventListener('submit', async (e) => {
-    e.preventDefault();
+.journal {
+    flex-grow: 1;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
-    const imageUrl = document.getElementById('imageUrl').value;
-    const text = document.getElementById('text').value;
-    const tags = document.getElementById('tags').value.split(',').map(t => t.trim());
-    const order = parseInt(document.getElementById('order').value);
+#journal-container {
+    background-color: rgba(255, 255, 255, 0.8); /* เพิ่มพื้นหลังโปร่งแสง */
+    border-radius: 15px; /* ขอบมน */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* เงาที่ดูดีขึ้น */
+    padding: 30px; /* เพิ่มระยะห่างภายใน */
+    text-align: center; /* จัดข้อความกลาง */
+}
 
-    const pageData = {
-        imageUrl,
-        text,
-        tags,
-        order,
-        createdAt: Date.now()
-    };
+.cover-image {
+    max-width: 90%;
+    max-height: 90%;
+    border-radius: 10px; /* ขอบมนสำหรับรูปภาพ */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* เงาเล็กน้อยสำหรับรูปภาพ */
+}
 
-    try {
-        const newPageRef = push(ref(database, 'pages'));
-        await set(newPageRef, pageData);
-        alert('เพิ่มหน้าสำเร็จแล้ว 🎉');
-        form.reset();
-    } catch (err) {
-        console.error(err);
-        alert('เกิดข้อผิดพลาดในการบันทึก');
-    }
-});
+#flipbook {
+    display: none;
+    width: 90%; /* ปรับขนาด flipbook */
+    max-width: 800px; /* กำหนดขนาดสูงสุด */
+    margin: 20px auto; /* จัดกลางและเพิ่มขอบด้านบน/ล่าง */
+    border-radius: 10px; /* ขอบมนสำหรับ flipbook */
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3); /* เงาที่เด่นขึ้นสำหรับ flipbook */
+    background-color: #f9f9f9; /* สีพื้นหลังอ่อนๆ สำหรับ flipbook */
+    padding: 20px; /* เพิ่มระยะห่างภายใน flipbook */
+}
+
+.navigation {
+    position: fixed;
+    bottom: 30px; /* ปรับตำแหน่งลงเล็กน้อย */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    gap: 15px; /* เพิ่มระยะห่างระหว่างปุ่ม */
+}
+
+.navigation button {
+    background-color: #e9ecef; /* สีพื้นหลังปุ่มที่ดูนุ่มนวลขึ้น */
+    border: none; /* ลบเส้นขอบ */
+    color: #495057; /* สีข้อความปุ่มที่เข้มขึ้นเล็กน้อย */
+    font-size: 1.2rem; /* ลดขนาดตัวอักษรเล็กน้อย */
+    padding: 12px 25px; /* ปรับขนาด padding */
+    cursor: pointer;
+    border-radius: 10px; /* ขอบมนของปุ่ม */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* เงาที่ละเอียดขึ้น */
+    transition: background-color 0.3s ease, transform 0.2s ease; /* เพิ่ม easing ให้ transition */
+}
+
+.navigation button:hover {
+    background-color: #ced4da; /* สีพื้นหลังเมื่อ hover */
+    transform: scale(1.05); /* ขยายเล็กน้อยเมื่อ hover */
+}
+
+#next-page {
+    display: block; /* แสดงปุ่มนี้ในหน้าปก */
+}
+
+#prev-page {
+    display: none; /* ซ่อนปุ่มย้อนกลับ */
+}
