@@ -51,7 +51,14 @@ coverage/
 firebase-debug.log
 firebase-debug.*.log
 
+# Vercel
+.vercel/
+
 # Temporary files
 *.tmp
 *.temp
+
+# Placeholder texture files (replace with real images)
+assets/textures/*.png
+assets/stickers/*.png
 .vercel

@@ -161,7 +161,7 @@ class TonfernJournal {
         }
     }
 
-    renderCurrentPage() {
+    async renderCurrentPage() {
         const pageContainer = document.getElementById('pageContainer');
         const currentPageData = this.pages[this.currentPage - 1];
 
@@ -170,6 +170,19 @@ class TonfernJournal {
             return;
         }
 
+        // Check if page should use scrapbook layout
+        if (currentPageData.layout === 'scrapbook') {
+            try {
+                // Import and use scrapbook renderer
+                const { renderScrapbook } = await import('../skins/scrapbook.js');
+                renderScrapbook(pageContainer, currentPageData);
+                return;
+            } catch (error) {
+                console.warn('Scrapbook renderer not available, falling back to default:', error);
+            }
+        }
+
+        // Default page rendering
         pageContainer.innerHTML = `
             <div class="page ${this.currentPage % 2 === 1 ? 'left' : 'right'}" data-page-id="${currentPageData.id}">
                 <button class="bookmark-btn" title="Bookmark" aria-pressed="${this.bookmarks.has(currentPageData.id)}">
