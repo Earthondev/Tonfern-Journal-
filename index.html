@@ -3,69 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tonfern Journal</title>
-    <link rel="stylesheet" href="./css/style.css">
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/4.1.0/turn.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/4.1.0/turn.html4.min.js"></script>
+    <title>Tonfern Journal - สมุดบันทึกดิจิทัล</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <div class="sidebar">
-            <h2>Table of Contents</h2>
-            <ul id="toc"></ul> <!-- แสดง TOC ที่นี่ -->
-            <div id="bookmark-section">
-                <h3>Bookmark Page</h3>
-                <button id="bookmark-btn">Bookmark</button>
+    <!-- Topbar -->
+    <header class="topbar">
+        <h1>Tonfern Journal</h1>
+        <div class="actions">
+            <button id="tocToggle" class="btn ghost" aria-expanded="false">สารบัญ</button>
+            <button id="addPageBtn" class="btn primary">เพิ่มหน้า</button>
+        </div>
+    </header>
+
+    <!-- Sidebar - Table of Contents -->
+    <div class="sidebar" id="sidebar" aria-hidden="true">
+        <div class="sidebar-header">
+            <h3><i class="fas fa-book-open"></i> สารบัญ</h3>
+            <button class="close-sidebar" id="closeSidebar">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="toc-container">
+            <ul class="toc-list" id="tocList">
+                <!-- TOC items will be generated here -->
+            </ul>
+        </div>
+    </div>
+
+        <!-- Main Book Container -->
+        <div class="book-container">
+            <!-- Book Cover -->
+            <div class="book-cover" id="bookCover">
+                <div class="cover-content">
+                    <h1 class="cover-title">Tonfern Journal</h1>
+                    <p class="cover-subtitle">สมุดบันทึกดิจิทัล</p>
+                    <div class="cover-decoration">
+                        <i class="fas fa-feather-alt"></i>
+                    </div>
+                    <button class="open-book-btn" id="openBookBtn">
+                        <i class="fas fa-book-open"></i> เปิดหนังสือ
+                    </button>
+                </div>
+            </div>
+
+            <!-- Book Pages -->
+            <div class="book-pages" id="bookPages" style="display: none;">
+                <div class="page-container" id="pageContainer">
+                    <!-- Pages will be generated here -->
+                </div>
+                
+                <!-- Navigation Controls -->
+                <div class="book-navigation">
+                    <button class="nav-btn prev-btn" id="prevBtn">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <div class="page-info">
+                        <span id="currentPage">1</span> / <span id="totalPages">1</span>
+                    </div>
+                    <button class="nav-btn next-btn" id="nextBtn">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+
+
             </div>
         </div>
-        <main class="journal">
-            <div id="journal-container">
-                <img src="https://imgur.com/khegeuu.jpg" alt="หน้าปกสมุด" class="cover-image">
+
+        <!-- Add Page Modal -->
+        <div class="modal" id="addPageModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>เพิ่มหน้าใหม่</h3>
+                    <button class="close-modal" id="closeModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="pageTitle">หัวข้อหน้า:</label>
+                        <input type="text" id="pageTitle" placeholder="ใส่หัวข้อหน้า">
+                    </div>
+                    <div class="form-group">
+                        <label for="pageContent">เนื้อหา:</label>
+                        <textarea id="pageContent" placeholder="ใส่เนื้อหาของหน้า"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="pageVideo">ลิงก์วิดีโอ (ไม่บังคับ):</label>
+                        <input type="url" id="pageVideo" placeholder="https://...">
+                    </div>
+                    <div class="form-group">
+                        <label for="pageNote">บันทึก (ไม่บังคับ):</label>
+                        <input type="text" id="pageNote" placeholder="บันทึกสั้นๆ เกี่ยวกับหน้านี้">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="cancelAddPage">ยกเลิก</button>
+                    <button class="btn btn-primary" id="savePage">บันทึก</button>
+                </div>
             </div>
-        </main>
-      <div id="flipbook">
-        <!-- หน้า 1 -->
-        <div class="page">
-          <img src="https://imgur.com/khegeuu.jpg" alt="หน้าปก" />
         </div>
 
-        <!-- หน้า 2 -->
-        <div class="page" data-title="หน้า 1">
-          <img src="https://imgur.com/rggbARA.jpg" alt="หน้า 1" />
-          <div class="page-tools">
-            <button class="bookmark-btn">🔖</button>
-            <button class="note-btn">📝</button>
-          </div>
-          <div class="note-popup">
-            <textarea placeholder="เขียนโน้ต..."></textarea>
-            <button class="save-note">บันทึก</button>
-          </div>
+        <!-- Note Modal -->
+        <div class="modal" id="noteModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>เพิ่มบันทึก</h3>
+                    <button class="close-modal" id="closeNoteModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="noteText">บันทึก:</label>
+                        <input type="text" id="noteText" placeholder="เขียนบันทึกสั้นๆ...">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="cancelNote">ยกเลิก</button>
+                    <button class="btn btn-primary" id="saveNote">บันทึก</button>
+                </div>
+            </div>
         </div>
+    </div>
 
-        <!-- หน้า 3 -->
-        <div class="page" data-title="วิดีโอ">
-          <video src="https://imgur.com/sbvgjjl.mp4" controls></video>
-          <div class="page-tools">
-            <button class="bookmark-btn">🔖</button>
-            <button class="note-btn">📝</button>
-          </div>
-          <div class="note-popup">
-            <textarea placeholder="เขียนโน้ต..."></textarea>
-            <button class="save-note">บันทึก</button>
-          </div>
-        </div>
-      </div>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-storage-compat.js"></script>
+    
+    <!-- Page Flip Sound -->
+    <audio id="pageFlipSound" preload="auto">
+        <source src="assets/sounds/page-flip.mp3" type="audio/mpeg">
+    </audio>
 
-      <!-- Navigation -->
-      <div class="navigation">
-        <button id="prev-page">←</button>
-        <button id="next-page">→</button>
-      </div>
-    </main>
-  </div>
-
-  <audio id="flip-sound" src="./assets/sounds/page-flip.mp3" preload="auto"></audio>
-  <script src="./js/script.js"></script>
+    <!-- Custom Scripts -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/script.js"></script>
 </body>
 </html>
