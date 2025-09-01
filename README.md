@@ -29,9 +29,9 @@
 
 ## 🚀 Live Demo
 
-**🌐 เว็บไซต์หลัก**: [https://tonfern-journal.vercel.app](https://tonfern-journal.vercel.app)
+**🌐 เว็บไซต์หลัก**: [https://tonfern-journal-acruydx8h-earthondevs-projects.vercel.app](https://tonfern-journal-acruydx8h-earthondevs-projects.vercel.app)
 
-**🔐 Admin Panel**: [https://tonfern-journal.vercel.app/admin](https://tonfern-journal.vercel.app/admin)
+**🔐 Admin Panel**: [https://tonfern-journal-acruydx8h-earthondevs-projects.vercel.app/admin](https://tonfern-journal-acruydx8h-earthondevs-projects.vercel.app/admin)
 
 ## 🛠️ การติดตั้ง
 

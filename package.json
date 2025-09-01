@@ -1,0 +1,37 @@
+{
+  "name": "tonfern-journal",
+  "version": "1.0.0",
+  "description": "🌿 Tonfern Journal - Premium Digital Notebook with Green Theme",
+  "main": "index.html",
+  "scripts": {
+    "dev": "python3 -m http.server 8000",
+    "start": "python3 -m http.server 8000",
+    "build": "echo 'Static site - no build required'",
+    "deploy": "vercel --prod"
+  },
+  "keywords": [
+    "digital-notebook",
+    "book-app",
+    "green-theme",
+    "firebase",
+    "responsive",
+    "thai-language",
+    "premium-ui"
+  ],
+  "author": "Your Name <your.email@example.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/tonfern-journal.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/tonfern-journal/issues"
+  },
+  "homepage": "https://tonfern-journal-acruydx8h-earthondevs-projects.vercel.app",
+  "devDependencies": {
+    "vercel": "^32.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
