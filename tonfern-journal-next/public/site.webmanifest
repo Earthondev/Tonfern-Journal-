@@ -1,0 +1,9 @@
+{
+  "name": "Tonfern Journal",
+  "short_name": "Journal",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#10b981",
+  "icons": []
+}
