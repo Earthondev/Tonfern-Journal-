@@ -1,194 +1,338 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import dynamic from 'next/dynamic';
 import Navigation from "@/components/Navigation";
 import { useJournalData } from "@/hooks/useJournalData";
+import { usePageFlip } from "@/hooks/usePageFlip";
 
-// Tier 1: Lazy Load Heavy Components
 const StoryRenderer = dynamic(() => import('@/components/StoryRenderer'), {
   ssr: false,
-  loading: () => <div className="h-[600px] w-full bg-stone-100 animate-pulse rounded-lg" />
+  loading: () => (
+    <div className="h-[500px] w-full rounded-lg animate-pulse" style={{ background: 'var(--paper-warm)' }} />
+  ),
 });
 
 export default function Home() {
   const { toc, page, loading, loadPage } = useJournalData();
   const [isBookOpen, setIsBookOpen] = useState(false);
 
+  const pageFlip = usePageFlip({
+    totalPages: toc.length,
+    onPageChange: (idx) => {
+      if (toc[idx]) loadPage(toc[idx].id);
+    },
+  });
+
+  const sortedToc = useMemo(() => [...toc].sort((a, b) => (a.order || 0) - (b.order || 0)), [toc]);
+
   const handleOpenBook = () => {
     setIsBookOpen(true);
+    if (sortedToc.length > 0) loadPage(sortedToc[0].id);
   };
 
+  // ─── Loading ─────────────────────────────
   if (loading) {
     return (
-      <main className="min-h-dvh grid place-items-center bg-[#f0f4f8]">
-        <div className="text-center">
-          {/* Add texture overlay to prevent plain color in production */}
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
-          <p className="text-emerald-600 font-handwriting text-xl">กำลังหยิบสมุด...</p>
+      <main className="min-h-dvh grid place-items-center" style={{ background: 'var(--paper)' }}>
+        <div className="text-center animate-fade-in">
+          <div className="spinner-journal mx-auto mb-6"></div>
+          <p className="text-lg tracking-wide" style={{ color: 'var(--ink-faded)', fontFamily: 'Kalam, cursive' }}>
+            กำลังหยิบสมุด...
+          </p>
         </div>
       </main>
     );
   }
 
-  // Cover View
+  // ─── Cover View ──────────────────────────
   if (!isBookOpen) {
     return (
-      <main className="min-h-dvh flex flex-col items-center justify-center bg-stone-100 p-4 perspective-1000">
+      <main className="min-h-dvh flex flex-col items-center justify-center p-6" style={{ background: 'var(--paper)' }}>
+
+        {/* Decorative Corner Flourishes */}
+        <div className="fixed top-6 left-6 w-16 h-16 opacity-10" style={{ color: 'var(--gold)' }}>
+          <svg viewBox="0 0 100 100" fill="currentColor">
+            <path d="M0,0 Q50,0 50,50 Q50,0 100,0 L100,0 Q50,0 50,50 L0,0Z" opacity="0.6" />
+            <path d="M0,10 C20,10 10,30 30,30 C10,30 20,50 0,50" fill="none" stroke="currentColor" strokeWidth="1.5" />
+          </svg>
+        </div>
+
+        {/* The Book */}
         <div
           onClick={handleOpenBook}
-          className="cursor-pointer group relative w-full max-w-md aspect-[3/4] bg-emerald-800 rounded-r-3xl rounded-l-md shadow-2xl transform transition-transform duration-500 hover:rotate-y-[-5deg] hover:scale-[1.02] flex flex-col items-center justify-center text-center border-l-8 border-emerald-900"
+          className="book-cover book-spine cursor-pointer group relative w-full max-w-sm aspect-[3/4] rounded-r-2xl rounded-l-sm flex flex-col items-center justify-center text-center transition-all duration-700 hover:scale-[1.02] animate-fade-in-up"
+          style={{ transformStyle: 'preserve-3d' }}
         >
-          {/* Leather Texture Effect */}
-          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/leather.png')] opacity-30 rounded-r-3xl rounded-l-md pointer-events-none"></div>
+          {/* Gold corner decorations */}
+          <div className="absolute top-4 left-6 right-4 h-px opacity-20" style={{ background: 'var(--gold)' }} />
+          <div className="absolute bottom-4 left-6 right-4 h-px opacity-20" style={{ background: 'var(--gold)' }} />
+          <div className="absolute top-4 bottom-4 left-6 w-px opacity-20" style={{ background: 'var(--gold)' }} />
+          <div className="absolute top-4 bottom-4 right-4 w-px opacity-20" style={{ background: 'var(--gold)' }} />
 
-          {/* Book Title */}
-          <div className="relative z-10 p-8 border-2 border-emerald-600/50 m-6 rounded-xl bg-emerald-900/10 backdrop-blur-sm">
-            <h1 className="text-5xl md:text-6xl font-serif font-bold text-amber-100 mb-4 drop-shadow-md">
+          {/* Gold corners */}
+          {[['top-3 left-5', ''], ['top-3 right-3', 'rotate-90'], ['bottom-3 left-5', '-rotate-90'], ['bottom-3 right-3', 'rotate-180']].map(([pos, rot], i) => (
+            <div key={i} className={`absolute ${pos} w-6 h-6 ${rot}`} style={{ color: 'var(--gold-light)' }}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M0,12 L0,2 Q0,0 2,0 L12,0" />
+              </svg>
+            </div>
+          ))}
+
+          {/* Title Panel */}
+          <div className="relative z-10 px-10 py-8 m-8" style={{
+            border: '1.5px solid rgba(201, 165, 92, 0.3)',
+            borderRadius: '8px',
+            background: 'rgba(0, 0, 0, 0.08)',
+          }}>
+            {/* Embossed Title */}
+            <h1 className="book-title font-['Playfair_Display',serif] text-5xl md:text-6xl font-bold mb-3 leading-tight">
               Tonfern<br />Journal
             </h1>
-            <p className="text-emerald-200 font-handwriting text-xl">
+
+            {/* Divider Line */}
+            <div className="w-16 h-px mx-auto my-4 animate-shimmer" style={{ background: 'var(--gold)' }} />
+
+            <p className="text-lg tracking-widest uppercase" style={{
+              color: 'rgba(223, 200, 138, 0.7)',
+              fontFamily: 'Crimson Pro, serif',
+              fontSize: '14px',
+              letterSpacing: '0.2em',
+            }}>
               บันทึกเรื่องราวของเฟิร์น
             </p>
           </div>
 
-          <div className="absolute bottom-8 text-emerald-300/60 text-sm animate-bounce">
+          {/* Bottom CTA */}
+          <div className="absolute bottom-10 animate-breathe" style={{
+            color: 'rgba(223, 200, 138, 0.45)',
+            fontFamily: 'Crimson Pro, serif',
+            fontSize: '13px',
+            letterSpacing: '0.15em',
+          }}>
             แตะเพื่อเปิดอ่าน
           </div>
+
+          {/* Hover shimmer overlay */}
+          <div className="absolute inset-0 rounded-r-2xl rounded-l-sm opacity-0 group-hover:opacity-100 transition-opacity duration-700"
+            style={{
+              background: 'linear-gradient(135deg, transparent 40%, rgba(201, 165, 92, 0.06) 50%, transparent 60%)',
+            }}
+          />
         </div>
 
-        {/* Subtle Login Link at bottom for Owner */}
-        <div className="mt-12 opacity-50 hover:opacity-100 transition-opacity">
+        {/* Navigation Link */}
+        <div className="mt-16 opacity-30 hover:opacity-80 transition-opacity duration-500">
           <Navigation />
         </div>
       </main>
     );
   }
 
-  // Journal View (Opened)
+  // ─── Page Flip Reader ────────────────────
   return (
-    <main className="min-h-dvh bg-stone-100 p-4 md:p-8 transition-colors duration-700">
-
-      {/* Top Navigation Bar */}
-      <div className="max-w-5xl mx-auto mb-6 flex justify-between items-center">
+    <main
+      className="min-h-dvh flex flex-col"
+      style={{ background: 'var(--paper)' }}
+      onTouchStart={pageFlip.handleTouchStart}
+      onTouchEnd={pageFlip.handleTouchEnd}
+    >
+      {/* Top Bar */}
+      <div className="reader-bar flex-none px-5 py-3 flex justify-between items-center">
         <button
           onClick={() => setIsBookOpen(false)}
-          className="text-emerald-800 hover:bg-emerald-100 px-4 py-2 rounded-full transition-colors font-handwriting text-lg flex items-center gap-2"
+          className="px-4 py-2 rounded-full transition-all duration-300 flex items-center gap-2 hover:scale-105"
+          style={{
+            color: 'var(--ink-light)',
+            fontFamily: 'Kalam, cursive',
+            fontSize: '16px',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'rgba(201, 165, 92, 0.1)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'transparent';
+          }}
         >
           📕 ปิดสมุด
         </button>
+
+        {/* Page Counter */}
+        <div className="flex items-center gap-3" style={{
+          color: 'var(--ink-faded)',
+          fontFamily: 'Crimson Pro, serif',
+          fontSize: '14px',
+          letterSpacing: '0.05em',
+        }}>
+          <span style={{ color: 'var(--gold-dark)' }}>{pageFlip.currentPage + 1}</span>
+          <span className="opacity-40">/</span>
+          <span>{sortedToc.length}</span>
+        </div>
+
         <Navigation />
       </div>
 
-      <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-8 items-start">
+      {/* Page Content Area */}
+      <div className="flex-1 flex items-center justify-center relative overflow-hidden px-3 py-4 md:px-12 md:py-8 animate-cover-open">
 
-        {/* Sidebar / TOC */}
-        <nav className="w-full md:w-64 glass-card rounded-xl p-6 sticky top-8 max-h-[80vh] overflow-y-auto">
-          <h3 className="font-serif text-xl text-emerald-900 mb-4 border-b border-emerald-100 pb-2">สารบัญ</h3>
-          <ul className="space-y-2">
-            {toc.map((it) => (
-              <li key={it.id}>
-                <button
-                  className={`w-full text-left px-4 py-2 rounded-lg transition-all font-handwriting text-lg ${page?.id === it.id
-                      ? 'bg-emerald-100 text-emerald-800 font-bold translate-x-1 shadow-sm'
-                      : 'text-stone-600 hover:bg-stone-50 hover:text-emerald-700'
-                    }`}
-                  onClick={() => loadPage(it.id)}
-                >
-                  {it.order ? `${it.order}. ` : ''}{it.title}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </nav>
+        {/* Left Arrow */}
+        <button
+          onClick={pageFlip.prevPage}
+          disabled={!pageFlip.canGoPrev || pageFlip.isFlipping}
+          className="nav-arrow hidden md:flex absolute left-6 z-10"
+        >
+          ‹
+        </button>
 
-        {/* Main Page Content (Paper Look) */}
-        <div className="flex-1 w-full">
+        {/* The Page */}
+        <div
+          className={`w-full max-w-lg mx-auto ${pageFlip.isFlipping
+              ? pageFlip.flipDirection === 'right'
+                ? 'animate-flip-right'
+                : 'animate-flip-left'
+              : ''
+            }`}
+        >
           {page ? (
-            <article className="bg-[#fdfbf7] min-h-[800px] w-full rounded-sm shadow-xl p-8 md:p-12 relative mx-auto max-w-4xl" style={{
-              backgroundImage: 'linear-gradient(#e5e5e5 1px, transparent 1px)',
-              backgroundSize: '100% 2rem',
-              boxShadow: '2px 3px 20px rgba(0,0,0,0.1), inset 0 0 60px rgba(0,0,0,0.05)'
-            }}>
-              {/* Paper Holes */}
-              <div className="absolute left-4 top-0 bottom-0 flex flex-col gap-8 py-8">
-                {[...Array(10)].map((_, i) => (
-                  <div key={i} className="w-4 h-4 rounded-full bg-stone-200 shadow-inner"></div>
-                ))}
-              </div>
+            <div className="journal-page rounded overflow-hidden">
+              {/* Top decorative edge */}
+              <div className="h-px w-full" style={{
+                background: 'linear-gradient(90deg, transparent, var(--gold-light), transparent)',
+                opacity: 0.2,
+              }} />
 
-              <div className="pl-8 md:pl-12">
-                <h2 className="text-4xl font-handwriting font-bold text-emerald-900 mb-6 leading-relaxed">
-                  {typeof page.title === "string" ? page.title : (page.title as any)?.th || (page.title as any)?.en}
-                </h2>
+              {/* Story Layout */}
+              {page.layout === 'story' && page.content && (
+                <StoryRenderer content={page.content} />
+              )}
 
-                <div className="text-stone-500 font-handwriting text-sm mb-8 flex items-center gap-2">
-                  📅 {new Date(page.createdAt).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })}
-                </div>
-
-                {/* --- STORY RENDER (for 'story' layout) --- */}
-                {page.layout === 'story' && page.content && (
-                  <div className="mb-8 transform rotate-1 transition-transform hover:rotate-0 duration-500">
-                    <StoryRenderer content={page.content} />
-                    {page.caption && <p className="text-center font-handwriting text-stone-600 mt-4 text-lg">{page.caption}</p>}
-                  </div>
-                )}
-
-                {/* --- STANDARD MEDIA --- */}
-                {page.media?.type === "image" && (
-                  <div className="transform -rotate-1 mb-8 p-3 bg-white shadow-lg inline-block">
+              {/* Image Layout */}
+              {page.media?.type === "image" && page.layout !== 'story' && (
+                <div className="p-6 md:p-10">
+                  <h2 className="text-2xl md:text-3xl font-bold mb-6" style={{
+                    fontFamily: 'Kalam, cursive',
+                    color: 'var(--ink)',
+                  }}>
+                    {typeof page.title === "string" ? page.title : (page.title as any)?.th}
+                  </h2>
+                  <div className="polaroid inline-block">
                     <img
                       src={page.media.src}
                       className="max-w-full rounded-sm max-h-[500px] object-cover"
                       alt="Journal Memory"
                     />
-                    {page.caption && <p className="text-center font-handwriting text-stone-600 mt-2">{page.caption}</p>}
                   </div>
-                )}
+                  {page.caption && (
+                    <p className="mt-5 text-lg" style={{
+                      fontFamily: 'Kalam, cursive',
+                      color: 'var(--ink-faded)',
+                    }}>{page.caption}</p>
+                  )}
+                </div>
+              )}
 
-                {page.media?.type === "pdf" && (
-                  <div className="mb-8 w-full h-[600px] bg-stone-100 border-2 border-dashed border-stone-300 rounded-lg overflow-hidden">
+              {/* PDF Layout */}
+              {page.media?.type === "pdf" && (
+                <div className="p-6">
+                  <h2 className="text-2xl font-bold mb-4" style={{
+                    fontFamily: 'Kalam, cursive',
+                    color: 'var(--ink)',
+                  }}>
+                    {typeof page.title === "string" ? page.title : (page.title as any)?.th}
+                  </h2>
+                  <div className="w-full h-[500px] rounded-lg overflow-hidden" style={{
+                    border: '2px dashed var(--paper-edge)',
+                    background: 'var(--paper-warm)',
+                  }}>
                     <iframe
                       src={`${page.media.src}#toolbar=0&navpanes=0`}
                       className="w-full h-full"
                       title="PDF Viewer"
                     />
                   </div>
-                )}
+                </div>
+              )}
 
-                {/* Text Content Area */}
-                {page.caption && page.media?.type !== "image" && page.layout !== 'story' && (
-                  <p className="text-xl font-handwriting text-stone-800 leading-10 tracking-wide">
-                    {page.caption}
-                  </p>
-                )}
+              {/* Fallback: Text page */}
+              {!page.content && !page.media && (
+                <div className="p-8 md:p-12 min-h-[400px]">
+                  <h2 className="text-3xl font-bold mb-6" style={{
+                    fontFamily: 'Playfair Display, serif',
+                    color: 'var(--ink)',
+                  }}>
+                    {typeof page.title === "string" ? page.title : (page.title as any)?.th}
+                  </h2>
+                  {page.caption && (
+                    <p className="text-xl leading-relaxed" style={{
+                      fontFamily: 'Kalam, cursive',
+                      color: 'var(--ink-light)',
+                      lineHeight: '2.2',
+                    }}>
+                      {page.caption}
+                    </p>
+                  )}
+                </div>
+              )}
 
-                {/* Blocks (Notes, Tapes, Polaroids) */}
-                {page.blocks && (
-                  <div className="relative h-[500px] w-full mt-8 border-t border-dashed border-emerald-100 pt-8">
-                    {page.blocks.map((block, idx) => (
-                      <div
-                        key={idx}
-                        className="absolute transform p-4 bg-yellow-100 shadow-md font-handwriting text-lg rotate-2"
-                        style={{
-                          left: block.x / 2,
-                          top: block.y / 2,
-                          transform: `rotate(${block.rot || 0}deg)`
-                        }}
-                      >
-                        📌 {block.text}
-                      </div>
-                    ))}
-                  </div>
-                )}
+              {/* Bottom decorative edge + page number */}
+              <div className="relative h-10">
+                <div className="absolute top-0 left-0 right-0 h-px" style={{
+                  background: 'linear-gradient(90deg, transparent, var(--gold-light), transparent)',
+                  opacity: 0.15,
+                }} />
+                <div className="absolute bottom-2 right-5 text-xs" style={{
+                  color: 'var(--rose-faded)',
+                  fontFamily: 'Crimson Pro, serif',
+                  fontStyle: 'italic',
+                }}>
+                  — {pageFlip.currentPage + 1} —
+                </div>
               </div>
-            </article>
+            </div>
           ) : (
-            <div className="text-center p-12 opacity-50">
-              เลือกหน้าจากสารบัญเพื่ออ่าน...
+            <div className="text-center p-16 rounded-lg animate-fade-in" style={{
+              background: 'rgba(245, 240, 232, 0.5)',
+            }}>
+              <p style={{ color: 'var(--ink-faded)', fontFamily: 'Kalam, cursive' }}>
+                ยังไม่มีเนื้อหา...
+              </p>
             </div>
           )}
         </div>
+
+        {/* Right Arrow */}
+        <button
+          onClick={pageFlip.nextPage}
+          disabled={!pageFlip.canGoNext || pageFlip.isFlipping}
+          className="nav-arrow hidden md:flex absolute right-6 z-10"
+        >
+          ›
+        </button>
+      </div>
+
+      {/* Bottom Dots (Mobile) */}
+      <div className="flex-none py-4 flex justify-center gap-2 md:hidden">
+        {sortedToc.map((_, idx) => (
+          <button
+            key={idx}
+            onClick={() => {
+              pageFlip.goToPage(idx);
+              loadPage(sortedToc[idx].id);
+            }}
+            className={`page-dot ${pageFlip.currentPage === idx ? 'active' : ''}`}
+          />
+        ))}
+      </div>
+
+      {/* Mobile Swipe Hint */}
+      <div className="flex-none pb-5 text-center md:hidden" style={{
+        color: 'var(--ink-faded)',
+        fontFamily: 'Crimson Pro, serif',
+        fontSize: '12px',
+        letterSpacing: '0.1em',
+        opacity: 0.5,
+      }}>
+        ← ปัดซ้าย-ขวาเพื่อพลิกหน้า →
       </div>
     </main>
   );

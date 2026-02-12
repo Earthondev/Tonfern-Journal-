@@ -1,13 +1,23 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+/* ─── Typography System ──────────────────────
+   Display: Cormorant Garamond (elegant serif)
+   Body: Loaded via Google Fonts link (Kanit, etc.)
+   Handwriting: Sriracha, Kalam, Itim
+   ───────────────────────────────────────────── */
+const displayFont = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-display",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
-  title: "Tonfern Journal - สมุดบันทึกดิจิทัล",
+  title: "Tonfern Journal — สมุดบันทึกดิจิทัล",
   description: "สมุดบันทึกดิจิทัลที่ออกแบบมาให้เหมือนหนังสือจริง พร้อมฟีเจอร์ที่น่าสนใจมากมาย",
-  keywords: ["digital-notebook", "book-app", "green-theme", "firebase", "responsive", "thai-language", "premium-ui"],
+  keywords: ["digital-notebook", "book-app", "journal", "firebase", "responsive", "thai-language", "premium-ui"],
   authors: [{ name: "Fern" }],
   creator: "Fern",
   publisher: "Tonfern Journal",
@@ -18,7 +28,7 @@ export const metadata: Metadata = {
   },
   metadataBase: new URL('https://tonfern-journal.vercel.app'),
   openGraph: {
-    title: "Tonfern Journal - สมุดบันทึกดิจิทัล",
+    title: "Tonfern Journal — สมุดบันทึกดิจิทัล",
     description: "สมุดบันทึกดิจิทัลที่ออกแบบมาให้เหมือนหนังสือจริง",
     url: "https://tonfern-journal.vercel.app",
     siteName: "Tonfern Journal",
@@ -35,7 +45,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Tonfern Journal - สมุดบันทึกดิจิทัล",
+    title: "Tonfern Journal — สมุดบันทึกดิจิทัล",
     description: "สมุดบันทึกดิจิทัลที่ออกแบบมาให้เหมือนหนังสือจริง",
     images: ["/og-image.jpg"],
   },
@@ -50,9 +60,6 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  verification: {
-    google: "your-google-verification-code",
-  },
 };
 
 export default function RootLayout({
@@ -61,13 +68,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="th">
+    <html lang="th" className={displayFont.variable}>
       <head>
-        {/* Google Fonts */}
+        {/* Google Fonts — Curated for Journal Aesthetic */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Sriracha&family=Kanit:wght@300;400;500;600;700&family=Kalam:wght@300;400;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Sriracha&family=Kanit:wght@300;400;500;600;700&family=Kalam:wght@300;400;700&family=Itim&family=Mitr:wght@300;400;500&family=Prompt:wght@300;400;500;600&family=Sarabun:wght@300;400;500;600&family=IBM+Plex+Sans+Thai:wght@300;400;500;600&family=Noto+Sans+Thai:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap"
           rel="stylesheet"
         />
 
@@ -78,12 +85,13 @@ export default function RootLayout({
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <link rel="manifest" href="/site.webmanifest" />
 
-        {/* Meta tags for Thai language */}
+        {/* Meta tags */}
         <meta name="language" content="th" />
         <meta name="geo.region" content="TH" />
         <meta name="geo.placename" content="Thailand" />
+        <meta name="theme-color" content="#3e5c3a" />
       </head>
-      <body className={inter.className} suppressHydrationWarning>
+      <body className="font-['Kanit',sans-serif] text-[#2c3e2d] antialiased" suppressHydrationWarning>
         {children}
       </body>
     </html>

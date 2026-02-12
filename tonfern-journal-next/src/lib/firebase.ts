@@ -26,8 +26,9 @@ export const isAuthenticated = () => {
   return auth.currentUser !== null;
 };
 
-export const isFern = () => {
-  return auth.currentUser?.uid === FERN_UID;
+export const isFern = (uid?: string) => {
+  const checkUid = uid || auth.currentUser?.uid;
+  return checkUid === FERN_UID || checkUid === process.env.NEXT_PUBLIC_OWNER_UID;
 };
 
 export type { User } from 'firebase/auth';

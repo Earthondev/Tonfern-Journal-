@@ -2,81 +2,382 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body {
+/* ═══════════════════════════════════════════
+   TONFERN JOURNAL — Design System
+   Aesthetic: Vintage Botanical Journal
+   ═══════════════════════════════════════════ */
+
+:root {
+  /* Palette — Aged Paper & Forest */
+  --paper: #f5f0e8;
+  --paper-warm: #efe8d8;
+  --paper-edge: #e6dcc8;
+  --ink: #2c3e2d;
+  --ink-light: #4a6b4c;
+  --ink-faded: #8a9b7e;
+  --gold: #c9a55c;
+  --gold-light: #dfc88a;
+  --gold-dark: #a07e3a;
+  --leather: #3e5c3a;
+  --leather-deep: #2a3f28;
+  --leather-worn: #4e6d4a;
+  --rose-faded: #c4a08a;
+  --shadow-warm: rgba(60, 40, 20, 0.12);
+  --shadow-deep: rgba(30, 20, 10, 0.25);
+}
+
+html,
+body {
   height: 100%;
 }
 
-/* Custom scrollbar */
+/* ─── Scrollbar ──────────────────────────── */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: var(--paper);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #10b981;
-  border-radius: 4px;
+  background: var(--gold);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #059669;
+  background: var(--gold-dark);
 }
 
-/* Background image with overlay */
+/* ─── Body Atmosphere ────────────────────── */
 body {
-  background-image: url('/images/background.jpg');
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-  background-repeat: no-repeat;
+  background-color: var(--paper);
+  background-image:
+    /* Subtle noise grain */
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E"),
+    /* Warm radial glow */
+    radial-gradient(ellipse at 30% 20%, rgba(201, 165, 92, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 70% 80%, rgba(62, 92, 58, 0.06) 0%, transparent 60%);
   position: relative;
 }
 
-body::before {
+/* ─── Glass Card ─────────────────────────── */
+.glass-card {
+  background: rgba(245, 240, 232, 0.7);
+  backdrop-filter: blur(12px) saturate(1.2);
+  border: 1px solid rgba(201, 165, 92, 0.15);
+  box-shadow:
+    0 4px 24px var(--shadow-warm),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+/* ─── Paper Page Effect ──────────────────── */
+.journal-page {
+  background: var(--paper);
+  background-image:
+    /* Aged paper texture */
+    linear-gradient(160deg, rgba(201, 165, 92, 0.04) 0%, transparent 40%),
+    linear-gradient(340deg, rgba(196, 160, 138, 0.05) 0%, transparent 40%);
+  box-shadow:
+    3px 6px 30px var(--shadow-deep),
+    -1px 0 0 var(--paper-edge),
+    inset 0 0 80px rgba(60, 40, 20, 0.04);
+  position: relative;
+}
+
+.journal-page::before {
   content: '';
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    135deg,
-    rgba(16, 185, 129, 0.1) 0%,
-    rgba(34, 197, 94, 0.15) 25%,
-    rgba(59, 130, 246, 0.1) 50%,
-    rgba(147, 51, 234, 0.1) 75%,
-    rgba(236, 72, 153, 0.1) 100%
-  );
-  z-index: -1;
+  right: 0;
+  bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  pointer-events: none;
+  border-radius: inherit;
 }
 
-/* Glass morphism effect for main content */
-.glass-card {
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+/* ─── Book Cover ─────────────────────────── */
+.book-cover {
+  background:
+    linear-gradient(135deg, var(--leather) 0%, var(--leather-deep) 40%, var(--leather) 60%, var(--leather-worn) 100%);
+  position: relative;
+  box-shadow:
+    6px 8px 40px rgba(30, 20, 10, 0.4),
+    2px 2px 0 var(--leather-deep),
+    inset 0 0 100px rgba(0, 0, 0, 0.15);
 }
 
-/* Enhanced text shadows for better readability */
-.text-shadow {
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+.book-cover::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='leather'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.5' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23leather)' opacity='0.08'/%3E%3C/svg%3E");
+  border-radius: inherit;
+  pointer-events: none;
 }
 
-/* Custom animations */
+/* Gold emboss title styling */
+.book-title {
+  color: var(--gold-light);
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    0 0 20px rgba(201, 165, 92, 0.15);
+  letter-spacing: 0.02em;
+}
+
+/* Spine edge */
+.book-spine {
+  border-left: 10px solid var(--leather-deep);
+  box-shadow: inset 6px 0 12px rgba(0, 0, 0, 0.2);
+}
+
+/* ─── Navigation Arrows ─────────────────── */
+.nav-arrow {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 1.5px solid var(--paper-edge);
+  color: var(--ink-light);
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 2px 12px var(--shadow-warm);
+}
+
+.nav-arrow:hover:not(:disabled) {
+  transform: scale(1.15);
+  background: var(--gold-light);
+  color: var(--leather-deep);
+  border-color: var(--gold);
+  box-shadow: 0 4px 20px rgba(201, 165, 92, 0.3);
+}
+
+.nav-arrow:disabled {
+  opacity: 0.15;
+  cursor: not-allowed;
+}
+
+/* ─── Page Dot Indicators ────────────────── */
+.page-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  background: var(--paper-edge);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.page-dot.active {
+  background: var(--gold);
+  width: 24px;
+  box-shadow: 0 0 8px rgba(201, 165, 92, 0.4);
+}
+
+/* ─── Top Bar ────────────────────────────── */
+.reader-bar {
+  background: rgba(245, 240, 232, 0.85);
+  backdrop-filter: blur(16px) saturate(1.3);
+  border-bottom: 1px solid rgba(201, 165, 92, 0.12);
+}
+
+/* ─── Animations ─────────────────────────── */
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(24px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes flipRight {
+  0% {
+    transform: perspective(1200px) rotateY(0deg);
+    opacity: 1;
+  }
+
+  40% {
+    transform: perspective(1200px) rotateY(-85deg);
+    opacity: 0.3;
+  }
+
+  100% {
+    transform: perspective(1200px) rotateY(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes flipLeft {
+  0% {
+    transform: perspective(1200px) rotateY(0deg);
+    opacity: 1;
+  }
+
+  40% {
+    transform: perspective(1200px) rotateY(85deg);
+    opacity: 0.3;
+  }
+
+  100% {
+    transform: perspective(1200px) rotateY(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes shimmerGold {
+  0% {
+    background-position: -200% center;
+  }
+
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes breathe {
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}
+
+@keyframes coverOpen {
+  from {
+    transform: perspective(1200px) rotateY(0deg) scale(0.95);
+    opacity: 0.8;
+  }
+
+  to {
+    transform: perspective(1200px) rotateY(0deg) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(30px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
 .animate-fade-in-up {
-  animation: fadeInUp 0.6s ease-out;
+  animation: fadeInUp 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out;
+}
+
+.animate-flip-right {
+  animation: flipRight 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.animate-flip-left {
+  animation: flipLeft 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.animate-cover-open {
+  animation: coverOpen 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.animate-slide-in {
+  animation: slideInFromRight 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent 30%, rgba(201, 165, 92, 0.15) 50%, transparent 70%);
+  background-size: 200% 100%;
+  animation: shimmerGold 3s ease-in-out infinite;
+}
+
+.animate-breathe {
+  animation: breathe 3s ease-in-out infinite;
+}
+
+/* ─── Utility ────────────────────────────── */
+.text-shadow {
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.text-shadow-gold {
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.3),
+    0 0 12px rgba(201, 165, 92, 0.2);
+}
+
+/* Polaroid photo styling */
+.polaroid {
+  background: white;
+  padding: 12px 12px 40px 12px;
+  box-shadow: 2px 4px 16px rgba(0, 0, 0, 0.12);
+  transform: rotate(-1.5deg);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.polaroid:hover {
+  transform: rotate(0deg) scale(1.02);
+}
+
+/* Washi tape decoration */
+.washi-tape {
+  position: relative;
+}
+
+.washi-tape::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-2deg);
+  width: 80px;
+  height: 24px;
+  background: linear-gradient(135deg, rgba(201, 165, 92, 0.4), rgba(196, 160, 138, 0.35));
+  border-radius: 2px;
+}
+
+/* Loading spinner */
+.spinner-journal {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--paper-edge);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
