@@ -69,7 +69,27 @@ NEXT_PUBLIC_OWNER_UID=...
 ```
 
 ## 🧠 AI Context / Rules
-- **Styling**: Always use Tailwind CSS. Match the "Scrapbook/Journal" aesthetic (warm tones, paper textures, handwritten-style fonts where appropriate).
-- **State Management**: Use React Hooks and Firebase Realtime Database for dynamic content.
+- **Styling**: Always use Tailwind CSS. Match the "Scrapbook/Journal" aesthetic.
+- **State Management**: Use React Hooks and Firebase Realtime Database.
 - **Type Safety**: strict TypeScript usage is enforced.
-- **Directory**: Always prioritize working within `tonfern-journal-next`. Ignore the root legacy files unless explicitly asked to reference them.
+- **Directory**: Always prioritize working within `tonfern-journal-next`.
+
+### 🚨 Mandatory Verification Process (กฎเหล็กการส่งมอบงาน)
+ทุกครั้งที่มีการแก้ไขหรือเพิ่มฟีเจอร์ **ต้องทดสอบให้ผ่านครบ 3 รอบ** มิฉะนั้นห้ามส่งงาน:
+
+1.  **Technical Check (รอบที่ 1)**:
+    - `npm run dev` ต้องไม่มี Terminal Error
+    - Console ใน Browser ต้องไม่มี Error แดง (ยกเว้น Extension)
+    - TypeScript ต้องไม่มี Type Error
+
+2.  **Visual Check (รอบที่ 2)**:
+    - หน้าเว็บต้องแสดงผลถูกต้อง (ไม่เพี้ยน, ไม่ซ้อนทับ)
+    - ต้องเช็คทั้งโหมด Desktop และ Simulation Mobile
+    - Texture และ Font ต้องโหลดติดครบถ้วน
+
+3.  **Functional Check (รอบที่ 3)**:
+    - ลองกดปุ่มหลักทุกปุ่มว่าทำงานได้จริง (เช่น เปิดสมุด, เปลี่ยนหน้า)
+    - ลองโหลดข้อมูลจริงจาก Firebase (ไม่ใช่แค่ Mock)
+    - ถ้าเป็น Admin: ลอง Upload รูป/PDF จริงๆ ว่าเข้า Cloudinary ไหม
+
+**"ถ้าไม่ผ่าน 3 ข้อนี้ = งานยังไม่เสร็จ"**

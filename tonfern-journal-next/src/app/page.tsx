@@ -1,246 +1,179 @@
 "use client";
-import { useEffect, useState } from "react";
-import { db } from "@/lib/firebase";
-import { ref, get } from "firebase/database";
-import { JournalPage, TOCItem } from "@/types/journal";
+import { useState } from "react";
 import Navigation from "@/components/Navigation";
-
-// Mock data for demo (fallback) - using static dates to avoid hydration mismatch
-const mockToc: TOCItem[] = [
-  { id: "1", title: "หน้าปก", order: 1 },
-  { id: "2", title: "สารบัญ", order: 2 },
-  { id: "3", title: "หน้าแรก", order: 3 },
-  { id: "4", title: "เรื่องราว", order: 4 },
-  { id: "5", title: "บันทึก", order: 5 },
-];
-
-const mockPages: Record<string, JournalPage> = {
-  "1": {
-    id: "1",
-    title: "Tonfern Journal",
-    layout: "cover",
-    order: 1,
-    createdAt: "2025-01-01T00:00:00.000Z",
-    updatedAt: "2025-01-01T00:00:00.000Z",
-  },
-  "2": {
-    id: "2",
-    title: "สารบัญ",
-    layout: "toc",
-    order: 2,
-    createdAt: "2025-01-01T00:00:00.000Z",
-    updatedAt: "2025-01-01T00:00:00.000Z",
-  },
-  "3": {
-    id: "3",
-    title: "หน้าแรก",
-    layout: "documentA4",
-    order: 3,
-    media: {
-      type: "image",
-      src: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=600&fit=crop",
-    },
-    caption: "เริ่มต้นการเดินทางใหม่",
-    createdAt: "2025-01-01T00:00:00.000Z",
-    updatedAt: "2025-01-01T00:00:00.000Z",
-  },
-  "4": {
-    id: "4",
-    title: "เรื่องราว",
-    layout: "story",
-    order: 4,
-    media: {
-      type: "pdf",
-      src: "https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf",
-      page: 1
-    },
-    caption: "เรื่องราวที่น่าสนใจ",
-    createdAt: "2025-01-01T00:00:00.000Z",
-    updatedAt: "2025-01-01T00:00:00.000Z",
-  },
-  "5": {
-    id: "5",
-    title: "บันทึก",
-    layout: "scrapbook",
-    order: 5,
-    blocks: [
-      { type: "note", text: "บันทึกความทรงจำ", x: 100, y: 100, rotation: 15 },
-      { type: "polaroid", text: "รูปภาพ", x: 300, y: 150, rotation: -10 },
-      { type: "tape", text: "เทป", x: 200, y: 300, rotation: 45 }
-    ] as any[], // Casting as blocks mock might still need precise matching but text fix is key
-    createdAt: "2025-01-01T00:00:00.000Z",
-    updatedAt: "2025-01-01T00:00:00.000Z",
-  },
-};
+import { useJournalData } from "@/hooks/useJournalData";
 
 export default function Home() {
-  const [toc, setToc] = useState<TOCItem[]>(mockToc);
-  const [page, setPage] = useState<JournalPage | null>(mockPages["1"]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { toc, page, loading, loadPage } = useJournalData();
+  const [isBookOpen, setIsBookOpen] = useState(false);
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async () => {
-    try {
-      // Try to load from Firebase first
-      const tocRef = ref(db, "toc/items");
-      const tocSnapshot = await get(tocRef);
-
-      if (tocSnapshot.exists()) {
-        const tocData = tocSnapshot.val();
-        // Firebase returns an object map, convert to array and sort
-        const tocList: TOCItem[] = Object.values(tocData);
-        tocList.sort((a, b) => a.order - b.order);
-
-        setToc(tocList);
-
-        // Load first page
-        if (tocList.length > 0) {
-          await loadPage(tocList[0].id);
-        }
-      } else {
-        // Use mock data if Firebase is empty
-        setToc(mockToc);
-        setPage(mockPages["1"]);
-      }
-    } catch (error) {
-      console.error("Error loading data:", error);
-      // Fallback to mock data
-      setToc(mockToc);
-      setPage(mockPages["1"]);
-    } finally {
-      setIsLoading(false);
-    }
+  const handleOpenBook = () => {
+    setIsBookOpen(true);
   };
 
-  const loadPage = async (pageId: string) => {
-    try {
-      const pageRef = ref(db, `pages/${pageId}`);
-      const pageSnapshot = await get(pageRef);
-
-      if (pageSnapshot.exists()) {
-        setPage(pageSnapshot.val());
-      } else {
-        // Fallback to mock data
-        setPage(mockPages[pageId] || null);
-      }
-    } catch (error) {
-      console.error("Error loading page:", error);
-      // Fallback to mock data
-      setPage(mockPages[pageId] || null);
-    }
-  };
-
-  if (isLoading) {
+  if (loading) {
     return (
-      <main className="min-h-dvh grid place-items-center">
+      <main className="min-h-dvh grid place-items-center bg-[#f0f4f8]">
         <div className="text-center">
+          {/* Add texture overlay to prevent plain color in production */}
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
-          <p className="text-emerald-600">กำลังโหลด...</p>
+          <p className="text-emerald-600 font-handwriting text-xl">กำลังหยิบสมุด...</p>
         </div>
       </main>
     );
   }
 
+  // Cover View
+  if (!isBookOpen) {
+    return (
+      <main className="min-h-dvh flex flex-col items-center justify-center bg-stone-100 p-4 perspective-1000">
+        <div
+          onClick={handleOpenBook}
+          className="cursor-pointer group relative w-full max-w-md aspect-[3/4] bg-emerald-800 rounded-r-3xl rounded-l-md shadow-2xl transform transition-transform duration-500 hover:rotate-y-[-5deg] hover:scale-[1.02] flex flex-col items-center justify-center text-center border-l-8 border-emerald-900"
+        >
+          {/* Leather Texture Effect */}
+          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/leather.png')] opacity-30 rounded-r-3xl rounded-l-md pointer-events-none"></div>
+
+          {/* Book Title */}
+          <div className="relative z-10 p-8 border-2 border-emerald-600/50 m-6 rounded-xl bg-emerald-900/10 backdrop-blur-sm">
+            <h1 className="text-5xl md:text-6xl font-serif font-bold text-amber-100 mb-4 drop-shadow-md">
+              Tonfern<br />Journal
+            </h1>
+            <p className="text-emerald-200 font-handwriting text-xl">
+              บันทึกเรื่องราวของเฟิร์น
+            </p>
+          </div>
+
+          <div className="absolute bottom-8 text-emerald-300/60 text-sm animate-bounce">
+            แตะเพื่อเปิดอ่าน
+          </div>
+        </div>
+
+        {/* Subtle Login Link at bottom for Owner */}
+        <div className="mt-12 opacity-50 hover:opacity-100 transition-opacity">
+          <Navigation />
+        </div>
+      </main>
+    );
+  }
+
+  // Journal View (Opened)
   return (
-    <main className="min-h-dvh p-6 grid gap-6">
-      {/* Navigation */}
-      <Navigation />
+    <main className="min-h-dvh bg-stone-100 p-4 md:p-8 transition-colors duration-700">
 
-      {/* Header */}
-      <header className="glass-card rounded-3xl p-6 text-center animate-fade-in-up">
-        <h1 className="text-4xl font-bold font-serif text-emerald-800 text-shadow mb-2">
-          Tonfern Journal
-        </h1>
-        <p className="text-lg text-emerald-700 font-handwriting">
-          บันทึกความทรงจำและเรื่องราว
-        </p>
-      </header>
+      {/* Top Navigation Bar */}
+      <div className="max-w-5xl mx-auto mb-6 flex justify-between items-center">
+        <button
+          onClick={() => setIsBookOpen(false)}
+          className="text-emerald-800 hover:bg-emerald-100 px-4 py-2 rounded-full transition-colors font-handwriting text-lg flex items-center gap-2"
+        >
+          📕 ปิดสมุด
+        </button>
+        <Navigation />
+      </div>
 
-      {/* TOC */}
-      <nav className="glass-card rounded-2xl p-4 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-        <ul className="flex gap-3 flex-wrap justify-center">
-          {toc.map((it) => (
-            <li key={it.id}>
-              <button
-                className="px-4 py-2 rounded-xl border border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 transition-all duration-300 text-emerald-800 font-medium hover:shadow-lg transform hover:-translate-y-1"
-                onClick={() => loadPage(it.id)}
-              >
-                {it.title}
-              </button>
-            </li>
-          ))}
-        </ul>
-      </nav>
+      <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-8 items-start">
 
-      {/* Page content */}
-      {page && (
-        <section className="glass-card w-full max-w-4xl rounded-3xl p-6 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
-          <h2 className="text-2xl font-bold text-center font-serif text-emerald-800 text-shadow mb-6">
-            {typeof page.title === "string" ? page.title : (page.title as any)?.th || (page.title as any)?.en}
-          </h2>
-
-          {/* Media content */}
-          {(page.media?.type === "image") && (
-            <div className="mb-6">
-              <img
-                src={page.media.src}
-                className="w-full rounded-2xl shadow-2xl"
-                alt="page"
-              />
-            </div>
-          )}
-
-          {(page.media?.type === "pdf") && (
-            <div className="mb-6">
-              <div className="w-full h-[80vh] bg-stone-100 rounded-2xl overflow-hidden shadow-inner border border-stone-200">
-                <iframe
-                  src={`${page.media.src}#toolbar=0&navpanes=0`}
-                  className="w-full h-full"
-                  title="PDF Viewer"
-                />
-              </div>
-              <div className="text-center mt-2">
-                <a
-                  href={page.media.src}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-emerald-600 hover:text-emerald-800 underline"
+        {/* Sidebar / TOC */}
+        <nav className="w-full md:w-64 glass-card rounded-xl p-6 sticky top-8 max-h-[80vh] overflow-y-auto">
+          <h3 className="font-serif text-xl text-emerald-900 mb-4 border-b border-emerald-100 pb-2">สารบัญ</h3>
+          <ul className="space-y-2">
+            {toc.map((it) => (
+              <li key={it.id}>
+                <button
+                  className={`w-full text-left px-4 py-2 rounded-lg transition-all font-handwriting text-lg ${page?.id === it.id
+                    ? 'bg-emerald-100 text-emerald-800 font-bold translate-x-1 shadow-sm'
+                    : 'text-stone-600 hover:bg-stone-50 hover:text-emerald-700'
+                    }`}
+                  onClick={() => loadPage(it.id)}
                 >
-                  เปิดในแท็บใหม่ / Download
-                </a>
+                  {it.order}. {it.title}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        {/* Main Page Content (Paper Look) */}
+        <div className="flex-1 w-full">
+          {page ? (
+            <article className="bg-[#fdfbf7] min-h-[800px] w-full rounded-sm shadow-xl p-8 md:p-12 relative mx-auto max-w-4xl" style={{
+              backgroundImage: 'linear-gradient(#e5e5e5 1px, transparent 1px)',
+              backgroundSize: '100% 2rem',
+              boxShadow: '2px 3px 20px rgba(0,0,0,0.1), inset 0 0 60px rgba(0,0,0,0.05)'
+            }}>
+              {/* Paper Holes */}
+              <div className="absolute left-4 top-0 bottom-0 flex flex-col gap-8 py-8">
+                {[...Array(10)].map((_, i) => (
+                  <div key={i} className="w-4 h-4 rounded-full bg-stone-200 shadow-inner"></div>
+                ))}
               </div>
+
+              <div className="pl-8 md:pl-12">
+                <h2 className="text-4xl font-handwriting font-bold text-emerald-900 mb-6 leading-relaxed">
+                  {typeof page.title === "string" ? page.title : (page.title as any)?.th || (page.title as any)?.en}
+                </h2>
+
+                <div className="text-stone-500 font-handwriting text-sm mb-8 flex items-center gap-2">
+                  📅 {new Date(page.createdAt).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })}
+                </div>
+
+                {/* Media Content */}
+                {page.media?.type === "image" && (
+                  <div className="transform -rotate-1 mb-8 p-3 bg-white shadow-lg inline-block">
+                    <img
+                      src={page.media.src}
+                      className="max-w-full rounded-sm max-h-[500px] object-cover"
+                      alt="Journal Memory"
+                    />
+                    {page.caption && <p className="text-center font-handwriting text-stone-600 mt-2">{page.caption}</p>}
+                  </div>
+                )}
+
+                {page.media?.type === "pdf" && (
+                  <div className="mb-8 w-full h-[600px] bg-stone-100 border-2 border-dashed border-stone-300 rounded-lg overflow-hidden">
+                    <iframe
+                      src={`${page.media.src}#toolbar=0&navpanes=0`}
+                      className="w-full h-full"
+                      title="PDF Viewer"
+                    />
+                  </div>
+                )}
+
+                {/* Text Content Area (Currently using caption as main text if no blocks) */}
+                {page.caption && page.media?.type !== "image" && (
+                  <p className="text-xl font-handwriting text-stone-800 leading-10 tracking-wide">
+                    {page.caption}
+                  </p>
+                )}
+
+                {/* Blocks (Notes, Tapes, Polaroids) */}
+                {page.blocks && (
+                  <div className="relative h-[500px] w-full mt-8 border-t border-dashed border-emerald-100 pt-8">
+                    {page.blocks.map((block, idx) => (
+                      <div
+                        key={idx}
+                        className="absolute transform p-4 bg-yellow-100 shadow-md font-handwriting text-lg rotate-2"
+                        style={{
+                          left: block.x / 2,
+                          top: block.y / 2,
+                          transform: `rotate(${block.rot || 0}deg)`
+                        }}
+                      >
+                        📌 {block.text}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </article>
+          ) : (
+            <div className="text-center p-12 opacity-50">
+              เลือกหน้าจากสารบัญเพื่ออ่าน...
             </div>
           )}
-
-          {/* Caption */}
-          {page.caption && (
-            <div className="text-center">
-              <p className="italic text-lg text-emerald-700 font-handwriting text-shadow">
-                {typeof page.caption === "string" ? page.caption : (page.caption as any)?.th || (page.caption as any).en}
-              </p>
-            </div>
-          )}
-
-          {/* Note */}
-          {page.note && (
-            <div className="text-center mt-4">
-              <p className="text-sm text-emerald-600 font-handwriting">
-                📝 {page.note}
-              </p>
-            </div>
-          )}
-        </section>
-      )}
-
-      {/* Footer */}
-      <footer className="glass-card rounded-2xl p-4 text-center animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
-        <p className="text-emerald-700 font-handwriting">
-          ✨ สร้างด้วย Next.js และ Tailwind CSS ✨
-        </p>
-      </footer>
+        </div>
+      </div>
     </main>
   );
 }

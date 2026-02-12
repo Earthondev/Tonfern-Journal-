@@ -6,13 +6,13 @@ export const EDITOR_UIDS = new Set([
 
 // Firebase config
 export const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyCJu9g3YVy9-sdvBas5ZiI1C8BhI2RP1Ig",
-  authDomain: "tonfern-journal.firebaseapp.com",
-  databaseURL: "https://tonfern-journal-default-rtdb.firebaseio.com",
-  projectId: "tonfern-journal",
-  storageBucket: "tonfern-journal.appspot.com",
-  messagingSenderId: "788428322570",
-  appId: "1:788428322570:web:54f8b440e3a4fad81e6cf3",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
 // Cloudinary config (ถ้าใช้)
