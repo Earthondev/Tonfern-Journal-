@@ -58,17 +58,21 @@ Install Command: npm install
 ไปที่ **Project Settings** → **Environment Variables**:
 
 ```
-NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSyCJu9g3YVy9-sdvBas5ZiI1C8BhI2RP1Ig
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=tonfern-journal.firebaseapp.com
-NEXT_PUBLIC_FIREBASE_DATABASE_URL=https://tonfern-journal-default-rtdb.firebaseio.com
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=tonfern-journal
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=tonfern-journal.appspot.com
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=788428322570
-NEXT_PUBLIC_FIREBASE_APP_ID=1:788428322570:web:54f8b440e3a4fad81e6cf3
+NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSy... (get from Firebase Console)
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_DATABASE_URL=https://your-project-default-rtdb.firebaseio.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=123456789
+NEXT_PUBLIC_FIREBASE_APP_ID=1:123456789:web:abcdef123456
+
+# Cloudinary
 NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your-cloud-name
 NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=your-upload-preset
-NEXT_PUBLIC_FERN_UID=mSg4iwFIrHatqLqa7q3gBe3oFTg1
-NEXT_PUBLIC_OWNER_UID=S3qTv2MlWQfV7aCz8Q7ouoLV0Pn2
+
+# Admin Access
+NEXT_PUBLIC_FERN_UID=your-admin-uid-1
+NEXT_PUBLIC_OWNER_UID=your-admin-uid-2
 ```
 
 ### 2. Environment Types

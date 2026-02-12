@@ -1,81 +1,106 @@
-"use client";
-import { useState } from "react";
-import { auth } from "@/lib/firebase";
-import { signInWithEmailAndPassword } from "firebase/auth";
+'use client';
 
-export default function Login() {
-  const [email, setE] = useState(""); 
-  const [pass, setP] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import {
+  signInWithPopup,
+  GoogleAuthProvider,
+  browserLocalPersistence,
+  setPersistence
+} from 'firebase/auth';
+import { auth } from '@/lib/firebase';
+import { isFern } from '@/lib/firebase';
+
+export default function LoginPage() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const router = useRouter();
 
   const handleLogin = async () => {
-    if (!email || !pass) {
-      setError("กรุณากรอกอีเมลและรหัสผ่าน");
-      return;
-    }
-
-    setIsLoading(true);
-    setError("");
+    setLoading(true);
+    setError('');
 
     try {
-      await signInWithEmailAndPassword(auth, email, pass);
-      location.href = "/admin/story";
-    } catch (error: any) {
-      console.error("Login error:", error);
-      setError("ล็อกอินไม่สำเร็จ: " + (error.message || "Unknown error"));
+      // 1. Set Persistence
+      await setPersistence(auth, browserLocalPersistence);
+
+      // 2. Sign In with Google
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      // 3. Check if user is authorized (Fern or Owner)
+      if (isFern(user.uid)) {
+        // 4. Set Cookie for Middleware (Simple Auth Token)
+        // In a real enterprise app, we'd verify the ID token on the server.
+        // For now, this cookie acts as a "Gate Pass" for the middleware.
+        document.cookie = `journal_token=${await user.getIdToken()}; path=/; max-age=3600; SameSite=Strict; Secure`;
+
+        router.push('/admin/pages');
+      } else {
+        setError('ขออภัยครับ เฉพาะเจ้าของสมุด (เฟิร์น) เท่านั้นที่เข้าได้ 🔒');
+        await auth.signOut();
+      }
+    } catch (err: any) {
+      console.error('Login error:', err);
+      setError('เกิดข้อผิดพลาดในการเข้าสู่ระบบ ลองใหม่อีกครั้งนะครับ');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
-    <main className="min-h-dvh grid place-items-center p-6">
-      <div className="glass-card grid gap-4 p-8 rounded-3xl border border-emerald-200 max-w-sm w-full animate-fade-in-up">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold font-serif text-emerald-800 text-shadow mb-2">
-            เข้าสู่ระบบ
-          </h1>
-          <p className="text-emerald-600 font-handwriting">
-            สำหรับผู้แก้ไขเท่านั้น
-          </p>
+    <main className="min-h-dvh flex items-center justify-center bg-stone-100 p-4">
+      <div className="bg-white p-8 rounded-2xl shadow-xl max-w-sm w-full text-center border border-emerald-100">
+        <h1 className="text-3xl font-serif text-emerald-800 mb-6">เข้าสู่ระบบ</h1>
+
+        <div className="mb-8">
+          <span className="text-6xl">🗝️</span>
         </div>
 
-        <div className="grid gap-3">
-          <input 
-            placeholder="อีเมล" 
-            type="email"
-            value={email}
-            onChange={(e) => setE(e.target.value)}
-            className="border border-emerald-200 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:border-transparent"
-            disabled={isLoading}
-          />
-          <input 
-            placeholder="รหัสผ่าน" 
-            type="password" 
-            value={pass}
-            onChange={(e) => setP(e.target.value)}
-            className="border border-emerald-200 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:border-transparent"
-            disabled={isLoading}
-          />
-          
-          {error && (
-            <p className="text-red-600 text-sm text-center bg-red-50 p-2 rounded-lg">
-              {error}
-            </p>
-          )}
-          
-          <button 
-            className="bg-emerald-600 text-white rounded-xl p-3 font-medium hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            onClick={handleLogin}
-            disabled={isLoading}
+        {error && (
+          <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-6 animate-pulse">
+            {error}
+          </div>
+        )}
+
+        <button
+          onClick={handleLogin}
+          disabled={loading}
+          className={`w-full py-3 px-4 rounded-xl text-white font-bold transition-all ${loading
+            ? 'bg-stone-400 cursor-not-allowed'
+            : 'bg-emerald-600 hover:bg-emerald-700 shadow-lg hover:shadow-xl transform hover:-translate-y-1'
+            }`}
+        >
+          {loading ? 'กำลังไขกุญแจ...' : 'Login with Google'}
+        </button>
+
+        {/* --- DEV ONLY: Bypass Login --- */}
+        {process.env.NODE_ENV === 'development' && (
+          <button
+            onClick={() => {
+              // Simulate Fern credentials
+              const fakeToken = "dev-token-bypass";
+              // We assume 'meemakham@gmail.com' corresponds to the authorized UID in .env.local
+              // If not, we might need to adjust .env or this bypass.
+              // For now, let's just set the cookie to pass middleware.
+              document.cookie = `journal_token=${fakeToken}; path=/; max-age=3600; SameSite=Strict; Secure`;
+              router.push('/admin/pages');
+            }}
+            className="w-full mt-4 py-2 px-4 rounded-xl border-2 border-dashed border-amber-400 text-amber-600 font-bold hover:bg-amber-50 text-sm"
           >
-            {isLoading ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ"}
+            🚧 Dev Bypass: meemakham@gmail.com
           </button>
-        </div>
+        )}
 
-        <div className="text-center text-sm text-emerald-600">
-          <p>🔐 เฉพาะผู้แก้ไขที่ได้รับอนุญาต</p>
+        <p className="mt-6 text-xs text-stone-400">
+          สำหรับผู้ดูแลระบบสมุดบันทึก Tonfern Journal เท่านั้น
+        </p>
+
+        <div className="mt-8 pt-4 border-t border-stone-100">
+          <a href="/" className="text-emerald-500 hover:underline text-sm font-handwriting">
+            ← กลับไปดูสมุด (ไม่ต้องล็อกอิน)
+          </a>
         </div>
       </div>
     </main>

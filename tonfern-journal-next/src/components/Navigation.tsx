@@ -1,78 +1,74 @@
-"use client";
-import { useEffect, useState } from "react";
-import { auth } from "@/lib/firebase";
-import { onAuthStateChanged } from "firebase/auth";
-import { EDITOR_UIDS } from "@/lib/config";
+'use client';
+
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { auth, isFern } from "@/lib/firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
 export default function Navigation() {
+  const pathname = usePathname();
+  const router = useRouter();
   const [isEditor, setIsEditor] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setIsEditor(user ? EDITOR_UIDS.has(user.uid) : false);
-      setIsLoading(false);
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser && isFern(currentUser.uid)) {
+        setIsEditor(true);
+      } else {
+        setIsEditor(false);
+      }
     });
 
     return () => unsubscribe();
   }, []);
 
-  if (isLoading) {
-    return (
-      <nav className="glass-card rounded-2xl p-4 mb-6">
-        <div className="flex justify-center">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-600"></div>
-        </div>
-      </nav>
-    );
-  }
+  const handleSignOut = async () => {
+    try {
+      await auth.signOut();
+      // Clear Middleware Cookie
+      document.cookie = 'journal_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      router.push("/");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
+
+  // Only show navigation for authorized users or on login page
+  if (pathname === '/login') return null;
 
   return (
-    <nav className="glass-card rounded-2xl p-4 mb-6 animate-fade-in-up">
-      <div className="flex flex-wrap gap-3 justify-center">
-        <Link
-          href="/"
-          className="px-4 py-2 rounded-xl border border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 transition-all duration-300 text-emerald-800 font-medium hover:shadow-lg transform hover:-translate-y-1"
-        >
-          🏠 หน้าหลัก
-        </Link>
-
-        {isEditor && (
-          <>
-            <Link
-              href="/admin/story"
-              className="px-4 py-2 rounded-xl border border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 transition-all duration-300 text-emerald-800 font-medium hover:shadow-lg transform hover:-translate-y-1"
-            >
-              ✏️ Story Editor
-            </Link>
-
-            <Link
-              href="/admin/pages"
-              className="px-4 py-2 rounded-xl border border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 transition-all duration-300 text-emerald-800 font-medium hover:shadow-lg transform hover:-translate-y-1"
-            >
-              📄 จัดการหน้า
-            </Link>
-
-            <Link
-              href="/login"
-              className="px-4 py-2 rounded-xl bg-red-600 text-white hover:bg-red-700 transition-all duration-300 font-medium hover:shadow-lg transform hover:-translate-y-1"
-            >
-              🚪 ออกจากระบบ
-            </Link>
-          </>
-        )}
-
-        {!isEditor && (
+    <nav className="flex items-center gap-4">
+      {isEditor ? (
+        <>
           <Link
-            href="/login"
-            className="p-2 rounded-full text-emerald-300/50 hover:text-emerald-600 hover:bg-emerald-100/50 transition-all duration-300"
-            title="สำหรับเจ้าของสมุด"
+            href="/admin/story"
+            className={`px-4 py-2 rounded-full font-handwriting transition-colors ${pathname === '/admin/story' ? 'bg-emerald-100 text-emerald-800' : 'text-stone-600 hover:bg-stone-100'}`}
           >
-            🗝️
+            ✨ เขียนเรื่องราว
           </Link>
-        )}
-      </div>
+          <Link
+            href="/admin/pages"
+            className={`px-4 py-2 rounded-full font-handwriting transition-colors ${pathname === '/admin/pages' ? 'bg-emerald-100 text-emerald-800' : 'text-stone-600 hover:bg-stone-100'}`}
+          >
+            📄 จัดการหน้า
+          </Link>
+          <button
+            onClick={handleSignOut}
+            className="px-4 py-2 rounded-full bg-red-50 text-red-600 hover:bg-red-100 font-handwriting transition-colors"
+          >
+            🚪 ออกจากหนังสือ
+          </button>
+        </>
+      ) : (
+        <Link
+          href="/login"
+          className="w-10 h-10 flex items-center justify-center rounded-full text-stone-300 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-500"
+          title="สำหรับเจ้าของสมุด"
+        >
+          🗝️
+        </Link>
+      )}
     </nav>
   );
 }

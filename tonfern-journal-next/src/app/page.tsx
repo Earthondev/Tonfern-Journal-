@@ -1,7 +1,15 @@
 "use client";
+
 import { useState } from "react";
+import dynamic from 'next/dynamic';
 import Navigation from "@/components/Navigation";
 import { useJournalData } from "@/hooks/useJournalData";
+
+// Tier 1: Lazy Load Heavy Components
+const StoryRenderer = dynamic(() => import('@/components/StoryRenderer'), {
+  ssr: false,
+  loading: () => <div className="h-[600px] w-full bg-stone-100 animate-pulse rounded-lg" />
+});
 
 export default function Home() {
   const { toc, page, loading, loadPage } = useJournalData();
@@ -82,12 +90,12 @@ export default function Home() {
               <li key={it.id}>
                 <button
                   className={`w-full text-left px-4 py-2 rounded-lg transition-all font-handwriting text-lg ${page?.id === it.id
-                    ? 'bg-emerald-100 text-emerald-800 font-bold translate-x-1 shadow-sm'
-                    : 'text-stone-600 hover:bg-stone-50 hover:text-emerald-700'
+                      ? 'bg-emerald-100 text-emerald-800 font-bold translate-x-1 shadow-sm'
+                      : 'text-stone-600 hover:bg-stone-50 hover:text-emerald-700'
                     }`}
                   onClick={() => loadPage(it.id)}
                 >
-                  {it.order}. {it.title}
+                  {it.order ? `${it.order}. ` : ''}{it.title}
                 </button>
               </li>
             ))}
@@ -118,7 +126,15 @@ export default function Home() {
                   📅 {new Date(page.createdAt).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })}
                 </div>
 
-                {/* Media Content */}
+                {/* --- STORY RENDER (for 'story' layout) --- */}
+                {page.layout === 'story' && page.content && (
+                  <div className="mb-8 transform rotate-1 transition-transform hover:rotate-0 duration-500">
+                    <StoryRenderer content={page.content} />
+                    {page.caption && <p className="text-center font-handwriting text-stone-600 mt-4 text-lg">{page.caption}</p>}
+                  </div>
+                )}
+
+                {/* --- STANDARD MEDIA --- */}
                 {page.media?.type === "image" && (
                   <div className="transform -rotate-1 mb-8 p-3 bg-white shadow-lg inline-block">
                     <img
@@ -140,8 +156,8 @@ export default function Home() {
                   </div>
                 )}
 
-                {/* Text Content Area (Currently using caption as main text if no blocks) */}
-                {page.caption && page.media?.type !== "image" && (
+                {/* Text Content Area */}
+                {page.caption && page.media?.type !== "image" && page.layout !== 'story' && (
                   <p className="text-xl font-handwriting text-stone-800 leading-10 tracking-wide">
                     {page.caption}
                   </p>
