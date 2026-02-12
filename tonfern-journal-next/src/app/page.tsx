@@ -19,6 +19,7 @@ const mockPages: Record<string, JournalPage> = {
     id: "1",
     title: "Tonfern Journal",
     layout: "cover",
+    order: 1,
     createdAt: "2025-01-01T00:00:00.000Z",
     updatedAt: "2025-01-01T00:00:00.000Z",
   },
@@ -26,6 +27,7 @@ const mockPages: Record<string, JournalPage> = {
     id: "2",
     title: "สารบัญ",
     layout: "toc",
+    order: 2,
     createdAt: "2025-01-01T00:00:00.000Z",
     updatedAt: "2025-01-01T00:00:00.000Z",
   },
@@ -33,10 +35,10 @@ const mockPages: Record<string, JournalPage> = {
     id: "3",
     title: "หน้าแรก",
     layout: "documentA4",
+    order: 3,
     media: {
       type: "image",
       src: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=600&fit=crop",
-      alt: "หน้าแรก"
     },
     caption: "เริ่มต้นการเดินทางใหม่",
     createdAt: "2025-01-01T00:00:00.000Z",
@@ -46,6 +48,7 @@ const mockPages: Record<string, JournalPage> = {
     id: "4",
     title: "เรื่องราว",
     layout: "story",
+    order: 4,
     media: {
       type: "pdf",
       src: "https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf",
@@ -59,11 +62,12 @@ const mockPages: Record<string, JournalPage> = {
     id: "5",
     title: "บันทึก",
     layout: "scrapbook",
+    order: 5,
     blocks: [
-      { type: "note", content: "บันทึกความทรงจำ", x: 100, y: 100, rotation: 15 },
-      { type: "polaroid", content: "รูปภาพ", x: 300, y: 150, rotation: -10 },
-      { type: "tape", content: "เทป", x: 200, y: 300, rotation: 45 }
-    ],
+      { type: "note", text: "บันทึกความทรงจำ", x: 100, y: 100, rotation: 15 },
+      { type: "polaroid", text: "รูปภาพ", x: 300, y: 150, rotation: -10 },
+      { type: "tape", text: "เทป", x: 200, y: 300, rotation: 45 }
+    ] as any[], // Casting as blocks mock might still need precise matching but text fix is key
     createdAt: "2025-01-01T00:00:00.000Z",
     updatedAt: "2025-01-01T00:00:00.000Z",
   },
@@ -71,7 +75,7 @@ const mockPages: Record<string, JournalPage> = {
 
 export default function Home() {
   const [toc, setToc] = useState<TOCItem[]>(mockToc);
-  const [page, setPage] = useState<JournalPage|null>(mockPages["1"]);
+  const [page, setPage] = useState<JournalPage | null>(mockPages["1"]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -83,14 +87,18 @@ export default function Home() {
       // Try to load from Firebase first
       const tocRef = ref(db, "toc/items");
       const tocSnapshot = await get(tocRef);
-      
+
       if (tocSnapshot.exists()) {
         const tocData = tocSnapshot.val();
-        setToc(tocData);
-        
+        // Firebase returns an object map, convert to array and sort
+        const tocList: TOCItem[] = Object.values(tocData);
+        tocList.sort((a, b) => a.order - b.order);
+
+        setToc(tocList);
+
         // Load first page
-        if (tocData.length > 0) {
-          await loadPage(tocData[0].id);
+        if (tocList.length > 0) {
+          await loadPage(tocList[0].id);
         }
       } else {
         // Use mock data if Firebase is empty
@@ -111,7 +119,7 @@ export default function Home() {
     try {
       const pageRef = ref(db, `pages/${pageId}`);
       const pageSnapshot = await get(pageRef);
-      
+
       if (pageSnapshot.exists()) {
         setPage(pageSnapshot.val());
       } else {
@@ -152,11 +160,11 @@ export default function Home() {
       </header>
 
       {/* TOC */}
-      <nav className="glass-card rounded-2xl p-4 animate-fade-in-up" style={{animationDelay: '0.2s'}}>
+      <nav className="glass-card rounded-2xl p-4 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
         <ul className="flex gap-3 flex-wrap justify-center">
           {toc.map((it) => (
             <li key={it.id}>
-              <button 
+              <button
                 className="px-4 py-2 rounded-xl border border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 transition-all duration-300 text-emerald-800 font-medium hover:shadow-lg transform hover:-translate-y-1"
                 onClick={() => loadPage(it.id)}
               >
@@ -169,40 +177,44 @@ export default function Home() {
 
       {/* Page content */}
       {page && (
-        <section className="glass-card w-full max-w-4xl rounded-3xl p-6 animate-fade-in-up" style={{animationDelay: '0.4s'}}>
+        <section className="glass-card w-full max-w-4xl rounded-3xl p-6 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
           <h2 className="text-2xl font-bold text-center font-serif text-emerald-800 text-shadow mb-6">
             {typeof page.title === "string" ? page.title : (page.title as any)?.th || (page.title as any)?.en}
           </h2>
-          
+
           {/* Media content */}
           {(page.media?.type === "image") && (
             <div className="mb-6">
-              <img 
-                src={page.media.src} 
-                className="w-full rounded-2xl shadow-2xl" 
+              <img
+                src={page.media.src}
+                className="w-full rounded-2xl shadow-2xl"
                 alt="page"
               />
             </div>
           )}
-          
+
           {(page.media?.type === "pdf") && (
             <div className="mb-6">
-              <div className="w-full h-96 bg-gray-100 rounded-2xl flex items-center justify-center">
-                <div className="text-center">
-                  <p className="text-lg text-gray-600 mb-2">📄 PDF Document</p>
-                  <a 
-                    href={page.media.src} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
-                  >
-                    เปิดดู PDF
-                  </a>
-                </div>
+              <div className="w-full h-[80vh] bg-stone-100 rounded-2xl overflow-hidden shadow-inner border border-stone-200">
+                <iframe
+                  src={`${page.media.src}#toolbar=0&navpanes=0`}
+                  className="w-full h-full"
+                  title="PDF Viewer"
+                />
+              </div>
+              <div className="text-center mt-2">
+                <a
+                  href={page.media.src}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-emerald-600 hover:text-emerald-800 underline"
+                >
+                  เปิดในแท็บใหม่ / Download
+                </a>
               </div>
             </div>
           )}
-          
+
           {/* Caption */}
           {page.caption && (
             <div className="text-center">
@@ -224,7 +236,7 @@ export default function Home() {
       )}
 
       {/* Footer */}
-      <footer className="glass-card rounded-2xl p-4 text-center animate-fade-in-up" style={{animationDelay: '0.6s'}}>
+      <footer className="glass-card rounded-2xl p-4 text-center animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
         <p className="text-emerald-700 font-handwriting">
           ✨ สร้างด้วย Next.js และ Tailwind CSS ✨
         </p>

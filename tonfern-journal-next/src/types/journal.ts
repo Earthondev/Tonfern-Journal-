@@ -3,7 +3,7 @@
 export interface JournalPage {
   id: string;
   title: string;
-  layout: 'classic' | 'documentA4' | 'scrapbook' | 'story';
+  layout: 'classic' | 'documentA4' | 'scrapbook' | 'story' | 'cover' | 'toc';
   content?: string;
   media?: PageMedia;
   caption?: string;
