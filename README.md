@@ -86,7 +86,7 @@ npm run dev
 หากมีคำถามหรือต้องการความช่วยเหลือ:
 
 - **GitHub Issues**: [github.com/yourusername/tonfern-journal](https://github.com/yourusername/tonfern-journal)
-- **Email**: fern@tonfern.com
+- **Email**: earthlikemwbb@gmail.com
 
 ---
 
